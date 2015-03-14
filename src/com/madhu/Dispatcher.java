@@ -3,70 +3,95 @@ package com.madhu;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class Dispatcher {
+	
+	class ParamInfo{
+		int index;
+		String className;
+		String packageName;
+		String value;
+	}
 
 	class Request {
-		String serviceName;
-		Object[] input;
+		private String serviceName;
+		private List<ParamInfo> input;
+		private String userId;
+		private String userRole;
 		public Request() {
 		}
 	}
 
 	class Response {
-		String response;
+		private String response;
+		private boolean success;
+		private String errorMessage; 
+		private String exceptionClass;
+		private String exceptionPackage;
 	}
 
-	public String DispatchAndInvoke(Request input) {
-
-		String name = input.getClass().getPackage().getName();
-		System.out.println("Dispatcher.DispatchAndInvoke():" + name);
+	public Response DispatchAndInvoke(Request input) {
+		Response response=new Response();
+		String packageName = input.getClass().getPackage().getName();
 		Class<? extends Dispatcher> class1 = this.getClass();
-		// Process @Test
+		Object res=null;
 		for (Method method : class1.getDeclaredMethods()) {
-			System.out.println("Dispatcher.DispatchAndInvoke():"+method.getName());
 			if (method.isAnnotationPresent(ServiceName.class)) {
-
 				Annotation annotation = method.getAnnotation(ServiceName.class);
 				ServiceName test = (ServiceName) annotation;
-
 				if (input.serviceName.equals(test.value())) {
 					try {
-						System.out.println("Dispatcher.DispatchAndInvoke()"+test.value());
-						Object response = method.invoke(this,"");
+						Class<?>[] parameterTypes = method.getParameterTypes();
+						for (Class<?> class2 : parameterTypes) {
+						}
+						res = method.invoke(this,input.input);
 					} catch (IllegalAccessException e) {
-						// TODO Auto-`generated catch block
 						e.printStackTrace();
 					} catch (IllegalArgumentException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (InvocationTargetException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 			}
 
 		}
-
-		return "";
+        response.response="";
+		return response;
 	}
 
 	@ServiceName("Test")
-	public void target(String args) {
+	public void target(String args,String arg2) {
        System.out.println("Dispatcher.target()");
 	}
 
 	public static void main(String[] arg) {
 
+		Dispatcher d=new Dispatcher();
 		System.out.println("Testing...");
+		String one="";
+		String two="";
+		String response=null;
+		response=d.invoker("test",response.getClass(),one,two);
+				
+		
+		
 		Dispatcher dis=new Dispatcher();
 		Request input=dis.new Request();
 		input.serviceName="Test";
+		
 		dis.DispatchAndInvoke(input);
 
 		//test();
 
+	}
+
+	private <T extends Object> T invoker(String serviceName,Class<T> type,Object... params) {
+		for (Object object : params) {
+			
+		}
+		return type.cast("");
 	}
 
 	/*private static void test() {
